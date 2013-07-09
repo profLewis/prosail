@@ -1,6 +1,5 @@
-
     SUBROUTINE run_prosail ( N, Cab, Car, Cbrown, Cw, Cm, lai, LIDFa, LIDFb, &
-                psoil, hspot, tts, tto, psi, retval )
+                rsoil, psoil, hspot, tts, tto, psi, TypeLidf, retval )
 
     USE MOD_ANGLE               ! defines pi & rad conversion
     USE MOD_staticvar           ! static variables kept in memory for optimization
@@ -14,7 +13,7 @@
     REAL*8, dimension(nw), intent(out) :: retval
     REAL*8, intent(in) :: N,Cab,Car,Cbrown,Cw,Cm
     ! CANOPY
-    REAL*8, intent(in) :: lai,LIDFa,LIDFb,psoil
+    REAL*8, intent(in) :: lai,LIDFa,LIDFb,psoil,rsoil
     REAL*8, intent(in) :: hspot
     REAL*8, intent(in) :: tts,tto,psi
     
@@ -40,7 +39,8 @@
     ALLOCATE (resh(nw),resv(nw))
     ALLOCATE (rsoil_old(nw))
 
-        TypeLidf=1
+        !TypeLidf=1
+        ! no need to restrict this
         ! if 2-parameters LIDF: TypeLidf=1
         !!!IF (TypeLidf.EQ.1) THEN
             ! LIDFa LIDF parameter a, which controls the average leaf slope
@@ -81,7 +81,8 @@
         ! rsoil2 = wet soil
         ALLOCATE (rsoil0(nw))
         !psoil   =   1.      ! soil factor (psoil=0: wet soil / psoil=1: dry soil)
-        rsoil0=psoil*Rsoil1+(1-psoil)*Rsoil2
+        ! rsoil as a state variable is soil brightness
+        rsoil0=rsoil*(psoil*Rsoil1+(1-psoil)*Rsoil2)
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !!  4SAIL canopy structure parm !!
@@ -102,20 +103,22 @@
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !!  direct / diffuse light  !!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! the direct and diffuse light are taken into account as proposed by:
+    ! This is not necessarily what we want -- output brf 
+    ! the direct and diffuse light are taken into account as proposed by:
         ! Francois et al. (2002) Conversion of 4001100 nm vegetation albedo 
         ! measurements into total shortwave broadband albedo using a canopy 
         ! radiative transfer model, Agronomie
-        skyl    =   0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd) ! % diffuse radiation
+        !skyl    =   0.847- 1.61*sin((90-tts)*rd)+ 1.04*sin((90-tts)*rd)*sin((90-tts)*rd) ! % diffuse radiation
         ! Es = direct
         ! Ed = diffuse
         ! PAR direct
-        PARdiro =   (1-skyl)*Es
+        !PARdiro =   (1-skyl)*Es
         ! PAR diffus
-        PARdifo =   (skyl)*Ed
+        !PARdifo =   (skyl)*Ed
         ! resv : directional reflectance
         
-        retval = (rdot*PARdifo+rsot*PARdiro)/(PARdiro+PARdifo)
+        !retval = (rdot*PARdifo+rsot*PARdiro)/(PARdiro+PARdifo)
+        retval = rdot
         deallocate ( lrt )
         deallocate ( rho )
         deallocate ( tau )
