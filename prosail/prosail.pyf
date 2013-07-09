@@ -3,7 +3,7 @@
 
 python module prosail ! in 
     interface  ! in :prosail
-        subroutine run_prosail(n,cab,car,cbrown,cw,cm,lai,lidfa,lidfb,psoil,hspot,tts,tto,psi,retval) ! in :prosail:run_prosail.f90
+        subroutine run_prosail(n,cab,car,cbrown,cw,cm,lai,lidfa,lidfb,bsoil,psoil,hspot,tts,tto,psi,lidfType,retval) ! in :prosail:run_prosail.f90
             use mod_sail
             use mod_angle
             use mod_flag_util
@@ -19,11 +19,13 @@ python module prosail ! in
             real*8 intent(in) :: lai
             real*8 intent(in) :: lidfa
             real*8 intent(in) :: lidfb
+            real*8 intent(in) :: bsoil
             real*8 intent(in) :: psoil
             real*8 intent(in) :: hspot
             real*8 intent(in) :: tts
             real*8 intent(in) :: tto
             real*8 intent(in) :: psi
+            integer intent(in) :: lidfType
             real*8 dimension(2101),intent(out) :: retval
         end subroutine run_prosail
     end interface 
